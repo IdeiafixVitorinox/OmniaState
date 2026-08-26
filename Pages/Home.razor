@@ -1,0 +1,762 @@
+﻿@page "/"
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<PageTitle>OmniaState – Regulação Sensorial</PageTitle>
+
+<div class="omniastate-fullscreen">
+    <!-- 1. Motor Gráfico Toroidal (60 FPS) -->
+    <canvas id="toroidCanvas"></canvas>
+
+    <!-- 2. Imagem de Fundo em Marca de Água -->
+    @if (sessionStarted && !isSessionCompleted)
+    {
+        <div class="watermark-container">
+            <img class="watermark-img @currentCssClass" src="@currentImageSrc" alt="BioGeometria" />
+        </div>
+    }
+
+    <!-- 🎯 3. GUIA DE ENTRADA & APRESENTAÇÃO INTEGRADA -->
+    @if (!sessionStarted && !isSessionCompleted)
+    {
+        <div class="welcome-guide-modal">
+            <header class="guide-header">
+                <h1 class="brand-title">OMNIASTATE</h1>
+                <p class="brand-tagline">Sistema de Regulação Sensorial Toroidal & BioGeometria</p>
+            </header>
+
+            <div class="guide-steps-grid">
+                <!-- Passo 1 -->
+                <div class="guide-card">
+                    <div class="card-num">1</div>
+                    <div class="card-icon">👁️</div>
+                    <h3>A Atitude Interior</h3>
+                    <p>Não forces a mente a parar. Fixa o olhar no <strong>centro imóvel (Coresponde ao 9 ou 0)</strong> e deixa a visão periférica absorver o fluxo e a geometria.</p>
+                </div>
+
+                <!-- Passo 2 -->
+                <div class="guide-card">
+                    <div class="card-num">2</div>
+                    <div class="card-icon">🎛️</div>
+                    <h3>Os 4 Estados de Ser</h3>
+                    <ul class="states-mini-list">
+                        <li><span class="dot green"></span> <strong>Ponto Zero:</strong> Reset & Eixo "Eu Sou"</li>
+                        <li><span class="dot gold"></span> <strong>Cura:</strong> Regeneração & Corpo</li>
+                        <li><span class="dot blue"></span> <strong>Clareza:</strong> Foco & Silêncio Mental</li>
+                        <li><span class="dot purple"></span> <strong>Paz:</strong> Rendição & Desapego</li>
+                    </ul>
+                </div>
+
+                <!-- Passo 3 -->
+                <div class="guide-card">
+                    <div class="card-num">3</div>
+                    <div class="card-icon">⏱️</div>
+                    <h3>Os 2 Modos</h3>
+                    <p>Usa o botão <strong>7s</strong> para quebrar instantaneamente a ansiedade no dia a dia (Corresponde ao 7), ou o botão principal para <strong>7 Minutos</strong> de integração profunda.</p>
+                </div>
+            </div>
+
+            <button class="btn-start" @onclick="StartExperience">
+                ENTRAR NO CAMPO SENSORIAL
+            </button>
+        </div>
+    }
+    else if (isSessionCompleted && sessionMode == "long")
+    {
+        <div class="welcome-guide-modal completion-modal">
+            <div class="completion-icon">✨</div>
+            <h2 class="completion-title">INTEGRAÇÃO CONCLUÍDA</h2>
+            <p class="completion-desc">O ciclo de 7 minutos foi completado. Permanece no estado de presença e quietude.</p>
+            
+            <button class="btn-start btn-restart" @onclick="RestartNewSession">
+                NOVA SESSÃO
+            </button>
+        </div>
+    }
+    else if (isSessionCompleted && sessionMode == "short-completed")
+    {
+        <div class="welcome-guide-modal completion-modal">
+            <div class="completion-icon">⚡</div>
+            <h2 class="completion-title">MICRO-SESSÃO CONCLUÍDA</h2>
+            <p class="completion-desc">Alinhamento instantâneo de 7 segundos concluído.</p>
+            
+            <button class="btn-start btn-restart" @onclick="RestartNewSession">
+                CONTINUAR
+            </button>
+        </div>
+    }
+    else
+    {
+        <!-- 4. Interface da Sessão Ativa no Topo -->
+        <div class="session-hud-top">
+            <div class="info-bar-horizontal">
+                @if (sessionMode == "long")
+                {
+                    <div class="timer-pill">
+                        <span class="timer-label">Integração:</span>
+                        <span class="timer-digits">@FormatTime(elapsedSeconds) / 07:00</span>
+                    </div>
+                }
+                @if (sessionMode == "short")
+                {
+                    <div class="timer-pill micro-pill">
+                        <span class="timer-label">Micro-Sessão:</span>
+                        <span class="timer-digits">7s</span>
+                    </div>
+                }
+
+                <div class="divider-line"></div>
+
+                <div class="state-meta-horizontal">
+                    <span class="active-title">@stateTitle</span>
+                    <span class="active-dot">•</span>
+                    <span class="active-desc">@stateDescription</span>
+                </div>
+            </div>
+
+            <!-- Seleção dos Estados -->
+            <div class="state-selector">
+
+                <!-- PONTO ZERO -->
+                <div class="state-block @(currentStateKey == "ponto-zero" ? "selected" : "")">
+                    <button class="state-btn @(currentStateKey == "ponto-zero" ? "active" : "")"
+                            @onclick='() => StartLongSession("ponto-zero")'>
+                        <span class="symbol">🟢</span>
+                        <span class="name">Ponto Zero</span>
+                        <span class="sub">Reset • Eixo "Eu Sou"</span>
+                    </button>
+
+                    <button class="micro-btn" title="Micro-Sessão Rápida"
+                            @onclick='() => StartShortSession("ponto-zero")'>
+                        7s
+                    </button>
+                </div>
+
+                <!-- CURA -->
+                <div class="state-block @(currentStateKey == "cura" ? "selected" : "")">
+                    <button class="state-btn @(currentStateKey == "cura" ? "active" : "")"
+                            @onclick='() => StartLongSession("cura")'>
+                        <span class="symbol">🟡</span>
+                        <span class="name">Cura & Vitalidade</span>
+                        <span class="sub">Harmonia Corpórea</span>
+                    </button>
+
+                    <button class="micro-btn" title="Micro-Sessão Rápida"
+                            @onclick='() => StartShortSession("cura")'>
+                        7s
+                    </button>
+                </div>
+
+                <!-- CLAREZA -->
+                <div class="state-block @(currentStateKey == "clareza" ? "selected" : "")">
+                    <button class="state-btn @(currentStateKey == "clareza" ? "active" : "")"
+                            @onclick='() => StartLongSession("clareza")'>
+                        <span class="symbol">🔵</span>
+                        <span class="name">Clareza & Foco</span>
+                        <span class="sub">Visão Sem Ilusão</span>
+                    </button>
+
+                    <button class="micro-btn" title="Micro-Sessão Rápida"
+                            @onclick='() => StartShortSession("clareza")'>
+                        7s
+                    </button>
+                </div>
+
+                <!-- PAZ -->
+                <div class="state-block @(currentStateKey == "paz" ? "selected" : "")">
+                    <button class="state-btn @(currentStateKey == "paz" ? "active" : "")"
+                            @onclick='() => StartLongSession("paz")'>
+                        <span class="symbol">🟣</span>
+                        <span class="name">Paz & Rendição</span>
+                        <span class="sub">Entrega à Graça</span>
+                    </button>
+
+                    <button class="micro-btn" title="Micro-Sessão Rápida"
+                            @onclick='() => StartShortSession("paz")'>
+                        7s
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .omniastate-fullscreen {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        background: #050508;
+        overflow: hidden;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    #toroidCanvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .watermark-container {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        z-index: 2;
+        overflow: hidden;
+        transform: translateY(0);
+    }
+
+    .watermark-img {
+        position: relative;
+        left: 0;
+        top: 0;
+        width: 82vmin;
+        height: 82vmin;
+        object-fit: cover;
+        mix-blend-mode: screen;
+        border-radius: 50%;
+        will-change: transform, opacity;
+        
+        -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 70%);
+        mask-image: radial-gradient(circle, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 70%);
+
+        animation: dissipateSmooth 12s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    .watermark-img.ponto-zero { filter: drop-shadow(0 0 40px #10b981); }
+    .watermark-img.cura       { filter: drop-shadow(0 0 40px #f59e0b); }
+    .watermark-img.clareza    { filter: drop-shadow(0 0 40px #38bdf8); }
+    .watermark-img.paz { 
+        filter: drop-shadow(0 0 40px #a855f7);
+        left: -4%; 
+    }
+
+    @@keyframes dissipateSmooth {
+        0% { opacity: 0; transform: scale(0.70); }
+        25% { opacity: 0.45; transform: scale(1.0); }
+        100% { opacity: 0.10; transform: scale(1.10); }
+    }
+
+    /* 🎯 PAINEL DE BOAS-VINDAS COM O GUIA PRÁTICO */
+    .welcome-guide-modal {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        background: rgba(10, 15, 25, 0.88);
+        padding: 40px 50px;
+        border-radius: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(28px);
+        box-shadow: 0 30px 70px rgba(0,0,0,0.85);
+        z-index: 20;
+        max-width: 820px;
+        width: 90vw;
+    }
+
+    .brand-title {
+        font-size: 2.2rem;
+        letter-spacing: 0.35em;
+        font-weight: 200;
+        color: #ffffff;
+        margin: 0;
+    }
+
+    .brand-tagline {
+        color: #94a3b8;
+        font-size: 0.88rem;
+        margin: 6px 0 28px 0;
+        letter-spacing: 0.08em;
+    }
+
+    .guide-steps-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+        text-align: left;
+    }
+
+    .guide-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 20px 18px;
+        border-radius: 18px;
+    }
+
+    .card-num {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.2);
+    }
+
+    .card-icon {
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+    }
+
+    .guide-card h3 {
+        margin: 0 0 8px 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #f8fafc;
+        letter-spacing: 0.05em;
+    }
+
+    .guide-card p {
+        margin: 0;
+        font-size: 0.78rem;
+        color: #94a3b8;
+        line-height: 1.45;
+    }
+
+    .guide-card strong {
+        color: #ffffff;
+    }
+
+    .states-mini-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .states-mini-list li {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .dot.green { background: #10b981; }
+    .dot.gold { background: #f59e0b; }
+    .dot.blue { background: #38bdf8; }
+    .dot.purple { background: #a855f7; }
+
+    .btn-start {
+        background: rgba(16, 185, 129, 0.25);
+        border: 1px solid rgba(16, 185, 129, 0.7);
+        color: #ffffff;
+        padding: 16px 48px;
+        border-radius: 9999px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        letter-spacing: 0.25em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-start:hover {
+        background: rgba(16, 185, 129, 0.55);
+        box-shadow: 0 0 35px rgba(16, 185, 129, 0.7);
+        transform: scale(1.02);
+    }
+
+    /* Modal de Conclusão */
+    .completion-modal {
+        padding: 45px 55px;
+    }
+
+    .completion-icon {
+        font-size: 2.5rem;
+        margin-bottom: 8px;
+    }
+
+    .completion-title {
+        font-size: 1.5rem;
+        letter-spacing: 0.25em;
+        font-weight: 300;
+        color: #10b981;
+        margin: 0 0 10px 0;
+    }
+
+    .completion-desc {
+        color: #94a3b8;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin-bottom: 28px;
+    }
+
+    /* HUD Superior */
+    .session-hud-top {
+        position: absolute;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        z-index: 10;
+        user-select: none;
+        width: max-content;
+    }
+
+    .info-bar-horizontal {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: rgba(15, 23, 42, 0.65);
+        padding: 6px 20px;
+        border-radius: 9999px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(16px);
+    }
+
+    .timer-pill {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        color: #94a3b8;
+    }
+
+    .timer-digits {
+        font-weight: 700;
+        color: #38bdf8;
+        font-family: monospace;
+        font-size: 0.95rem;
+    }
+
+    .micro-pill .timer-digits {
+        color: #f59e0b;
+    }
+
+    .divider-line {
+        width: 1px;
+        height: 16px;
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .state-meta-horizontal {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .active-title {
+        font-size: 0.88rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        color: #ffffff;
+    }
+
+    .active-dot {
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+    .active-desc {
+        font-size: 0.76rem;
+        color: #94a3b8;
+    }
+
+    .state-selector {
+        display: flex;
+        gap: 10px;
+        background: rgba(15, 23, 42, 0.75);
+        padding: 6px;
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(25px);
+    }
+
+    .state-block {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 3px 6px 3px 3px;
+        gap: 4px;
+        transition: all 0.3s ease;
+    }
+
+    .state-block.selected {
+        background: rgba(255, 255, 255, 0.10);
+        border-color: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .state-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: transparent;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 12px;
+        cursor: pointer;
+        min-width: 105px;
+    }
+
+    .symbol {
+        font-size: 1.05rem;
+        margin-bottom: 2px;
+    }
+
+    .name {
+        font-size: 0.80rem;
+        font-weight: 600;
+        color: #e2e8f0;
+    }
+
+    .sub {
+        font-size: 0.60rem;
+        color: #64748b;
+    }
+
+    .micro-btn {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        padding: 6px 8px;
+        border-radius: 10px;
+        font-size: 0.70rem;
+        font-weight: 700;
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .micro-btn:hover {
+        background: rgba(245, 158, 11, 0.3);
+        border-color: rgba(245, 158, 11, 0.6);
+        color: #ffffff;
+        transform: scale(1.08);
+    }
+</style>
+
+@code {
+    private IJSObjectReference? _jsModule;
+    private static Home? _instance;
+
+    private bool sessionStarted = false;
+    private bool isSessionCompleted = false;
+    private int elapsedSeconds = 0;
+    private const int TargetSeconds = 7 * 60; // 7 Minutos
+    private System.Threading.Timer? _sessionTimer;
+
+    private string sessionMode = "none";
+    private string currentCssClass = "ponto-zero";
+    private string currentStateKey = "ponto-zero";
+    private string currentImageSrc = "images/ponto-zero.jpg";
+    private string stateTitle = "PONTO ZERO";
+    private string stateDescription = "Eixo Vertical • Presença do Eu Sou • Emissor Central BG3";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _instance = this;
+            _jsModule = await JS.InvokeAsync<IJSObjectReference>(
+                "import",
+                $"./js/toroidalCanvas.js?t={DateTime.UtcNow.Ticks}"
+            );
+            await _jsModule.InvokeVoidAsync("initToroid", "toroidCanvas");
+        }
+    }
+
+    private async Task StartExperience()
+    {
+        sessionMode = "long";
+        sessionStarted = true;
+        isSessionCompleted = false;
+        await SetState("ponto-zero");
+    }
+
+    private async Task StartLongSession(string key)
+    {
+        sessionMode = "long";
+        sessionStarted = true;
+        isSessionCompleted = false;
+        await SetState(key);
+    }
+
+    private async Task StartShortSession(string key)
+    {
+        sessionMode = "short";
+        sessionStarted = true;
+        isSessionCompleted = false;
+        await RunMicroSession(key);
+    }
+
+    private async Task RestartNewSession()
+    {
+        sessionMode = "long";
+        sessionStarted = true;
+        isSessionCompleted = false;
+        _sessionTimer?.Dispose();
+        await SetState(currentStateKey);
+    }
+
+    private void ResetAndStartTimer()
+    {
+        elapsedSeconds = 0;
+        isSessionCompleted = false;
+        _sessionTimer?.Dispose();
+
+        _sessionTimer = new System.Threading.Timer(async _ =>
+        {
+            if (sessionMode == "long" && elapsedSeconds < TargetSeconds)
+            {
+                elapsedSeconds++;
+                await InvokeAsync(StateHasChanged);
+            }
+            else if (sessionMode == "long" && elapsedSeconds >= TargetSeconds)
+            {
+                isSessionCompleted = true;
+                _sessionTimer?.Dispose();
+
+                await InvokeAsync(async () =>
+                {
+                    if (_jsModule != null)
+                    {
+                        await _jsModule.InvokeVoidAsync("activateState", currentStateKey, 0.0008, new { r = 16, g = 185, b = 129 });
+                    }
+                    StateHasChanged();
+                });
+            }
+        }, null, 1000, 1000);
+    }
+
+    private string FormatTime(int seconds)
+    {
+        var mins = seconds / 60;
+        var secs = seconds % 60;
+        return $"{mins:00}:{secs:00}";
+    }
+
+    private async Task SetState(string key)
+    {
+        currentStateKey = key;
+        currentCssClass = key;
+        ResetAndStartTimer();
+
+        switch (key)
+        {
+            case "cura":
+                currentImageSrc = "images/cura.png";
+                stateTitle = "CURA & VITALIDADE";
+                stateDescription = "Harmonizador L-66 • Higher Harmonic of Gold";
+                await SendToJS("cura", 0.004, 245, 158, 11);
+                break;
+
+            case "clareza":
+                currentImageSrc = "images/clareza.webp";
+                stateTitle = "CLAREZA & FOCO";
+                stateDescription = "Emissor Polar de 16 Raios • Visão Sem Ilusão";
+                await SendToJS("clareza", 0.006, 56, 189, 248);
+                break;
+
+            case "paz":
+                currentImageSrc = "images/paz.jpg";
+                stateTitle = "PAZ & RENDIÇÃO";
+                stateDescription = "Flor da Coerência • Entrega à Graça";
+                await SendToJS("paz", 0.003, 168, 85, 247);
+                break;
+
+            case "ponto-zero":
+            default:
+                currentImageSrc = "images/ponto-zero.jpg";
+                stateTitle = "PONTO ZERO";
+                stateDescription = "Eixo Vertical Cósmico • Presença do Eu Sou";
+                await SendToJS("ponto-zero", 0.0025, 16, 185, 129);
+                break;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task RunMicroSession(string key)
+    {
+        currentStateKey = key;
+        currentCssClass = key;
+        _sessionTimer?.Dispose();
+
+        switch (key)
+        {
+            case "cura":
+                currentImageSrc = "images/cura.png";
+                stateTitle = "CURA & VITALIDADE (7s)";
+                stateDescription = "Harmonizador L-66 • Pulso de Regeneração";
+                break;
+
+            case "clareza":
+                currentImageSrc = "images/clareza.webp";
+                stateTitle = "CLAREZA & FOCO (7s)";
+                stateDescription = "Emissor Polar • Reset Rápido de Atenção";
+                break;
+
+            case "paz":
+                currentImageSrc = "images/paz.jpg";
+                stateTitle = "PAZ & RENDIÇÃO (7s)";
+                stateDescription = "Flor da Coerência • Desapego Instantâneo";
+                break;
+
+            case "ponto-zero":
+            default:
+                currentImageSrc = "images/ponto-zero.jpg";
+                stateTitle = "PONTO ZERO (7s)";
+                stateDescription = "Eixo Vertical Cósmico • Reset Instantâneo";
+                break;
+        }
+
+        if (_jsModule != null)
+        {
+            await _jsModule.InvokeVoidAsync("activateMicroSession", key);
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task SendToJS(string key, double speed, int r, int g, int b)
+    {
+        if (_jsModule != null)
+        {
+            await _jsModule.InvokeVoidAsync("activateState", key, speed, new { r, g, b });
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _sessionTimer?.Dispose();
+        if (_jsModule != null)
+        {
+            await _jsModule.DisposeAsync();
+        }
+    }
+
+    [JSInvokable("MicroSessionEnded")]
+    public static void MicroSessionEnded()
+    {
+        _instance?.OnMicroSessionEnded();
+    }
+
+    private void OnMicroSessionEnded()
+    {
+        sessionMode = "short-completed";
+        sessionStarted = false;
+        isSessionCompleted = true;
+        InvokeAsync(StateHasChanged);
+    }
+}
