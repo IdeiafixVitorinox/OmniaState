@@ -550,102 +550,74 @@
         cursor: pointer;
     }
 
-    /* 📱 ADAPTAÇÃO PERFEITA PARA TELEMÓVEL NA VERTICAL (SEM CORTES) */
+    /* 📱 ADAPTAÇÃO FORÇADA PARA TELEMÓVEL (GRADE 2x2) */
     @@media (max-width: 768px) {
-        .welcome-guide-modal {
-            padding: 24px 18px;
-            border-radius: 20px;
-            width: 94vw;
-        }
-
-        .brand-title {
-            font-size: 1.5rem;
-            letter-spacing: 0.25em;
-        }
-
-        .brand-tagline {
-            font-size: 0.75rem;
-            margin-bottom: 16px;
-        }
-
-        .guide-steps-grid {
-            grid-template-columns: 1fr;
-            gap: 10px;
-            margin-bottom: 18px;
-        }
-
-        .guide-card {
-            padding: 12px 14px;
-        }
-
-        .btn-start {
-            padding: 12px 30px;
-            font-size: 0.78rem;
-            letter-spacing: 0.15em;
-            width: 100%;
-        }
-
-        /* 🎯 BARRA DO TOPO NO TELEMÓVEL */
         .session-hud-top {
-            top: 10px;
-            width: 94vw;
-            max-width: 94vw;
+            top: 10px !important;
+            width: 95vw !important;
+            max-width: 95vw !important;
         }
 
         .info-bar-horizontal {
-            width: 100%;
-            justify-content: center;
-            padding: 4px 10px;
-            gap: 8px;
-            box-sizing: border-box;
+            width: 100% !important;
+            justify-content: center !important;
+            padding: 4px 10px !important;
+            gap: 6px !important;
+            box-sizing: border-box !important;
         }
 
         .active-desc {
-            display: none; /* Oculta a descrição longa para poupar espaço */
+            display: none !important;
         }
 
-        /* 🎯 GRADE 2x2: Elimina definitivamente os cortes laterais */
+        /* 🎯 GRADE 2x2 FORÇADA: 2 colunas perfeitas sem cortes laterais */
         .state-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* 2 botões por linha */
-            gap: 6px;
-            width: 100%;
-            padding: 6px;
-            box-sizing: border-box;
-            border-radius: 16px;
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important; /* Força 2 colunas */
+            gap: 6px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            padding: 6px !important;
+            box-sizing: border-box !important;
+            border-radius: 16px !important;
+            overflow-x: visible !important;
         }
 
         .state-block {
-            justify-content: space-between;
-            padding: 3px 6px;
-            border-radius: 12px;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 4px 8px !important;
+            border-radius: 12px !important;
+            width: auto !important;
+            flex-shrink: 1 !important;
         }
 
         .state-btn {
-            min-width: auto;
-            padding: 3px 4px;
-            align-items: flex-start;
-            text-align: left;
+            min-width: auto !important;
+            padding: 2px 4px !important;
+            align-items: flex-start !important;
+            text-align: left !important;
         }
 
         .state-btn .symbol {
-            font-size: 0.90rem;
-            margin-bottom: 0;
+            font-size: 0.95rem !important;
+            margin-bottom: 0 !important;
         }
 
         .state-btn .name {
-            font-size: 0.70rem;
-            white-space: nowrap;
+            font-size: 0.72rem !important;
+            white-space: nowrap !important;
         }
 
         .state-btn .sub {
-            display: none; /* Oculta o subtítulo pequeno no telemóvel para ficar limpo */
+            display: none !important;
         }
 
         .micro-btn {
-            padding: 4px 7px;
-            font-size: 0.65rem;
-            border-radius: 8px;
+            padding: 5px 8px !important;
+            font-size: 0.68rem !important;
+            border-radius: 8px !important;
         }
     }
 
