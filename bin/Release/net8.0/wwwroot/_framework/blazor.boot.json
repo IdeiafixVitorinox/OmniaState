@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "OmniaState",
   "resources": {
-    "hash": "sha256-CDwed8XnF42Y+EnW0PZ/sYD9nqzbkRV2OguA7ZAUrpM=",
+    "hash": "sha256-IXIL+Hu3XCXXEeERb1Q5ybiTbpNWQP/j9zfqoaCehhw=",
     "jsModuleNative": {
       "dotnet.native.8.0.30.obzsitvuuz.js": "sha256-dexsp+9ih2C28zVhNnPXUbkz2QCq7lHpkyDcmaLl7NQ="
     },
@@ -208,10 +208,10 @@
       "mscorlib.wasm": "sha256-pP80UGziulDYhvVdeUaGEq9FlrHQDQmnCqVvx1FJZis=",
       "netstandard.wasm": "sha256-ARMsMyhWuSDjvzisfZbnEptnxh8Vh7VpHPhuT6iazy0=",
       "System.Private.CoreLib.wasm": "sha256-+28m4yuZsdz9ij1sJHvNH896fSI8gXgrQ9bhGO76Qqo=",
-      "OmniaState.wasm": "sha256-6kNOT+BPr+E2c/MAkKqoG90ql6l68setef9i/jxtXKQ="
+      "OmniaState.wasm": "sha256-bLF5ZHau/jthTDd9gZBIiQ0yNJMRBNFfpa0fkU3BkKs="
     },
     "pdb": {
-      "OmniaState.pdb": "sha256-cIEcveBvGvf5bilygcYJxHlh+9pCfZcaewh8HasRVBM="
+      "OmniaState.pdb": "sha256-+CSdGIBtO2c/UaxuxJEX8X8wD9lLMwYL8Nlavs9DzNY="
     }
   },
   "cacheBootResources": true,

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OmniaState")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2ff2ca2048ef7ebcae0a4c1f12e7f7128e2bdfd7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+46ce5b637f5730b0333485dd90c97ee9674cc64c")]
 [assembly: System.Reflection.AssemblyProductAttribute("OmniaState")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OmniaState")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

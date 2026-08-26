@@ -1030,3 +1030,5 @@
 /media/Elements/Projetos/OmniaState/obj/Release/net8.0/refint/OmniaState.dll
 /media/Elements/Projetos/OmniaState/obj/Release/net8.0/OmniaState.pdb
 /media/Elements/Projetos/OmniaState/obj/Release/net8.0/ref/OmniaState.dll
+/media/Elements/Projetos/OmniaState/bin/Release/net8.0/render-build/sample-data/weather.json
+/media/Elements/Projetos/OmniaState/bin/Release/net8.0/render-build/_framework/blazor.boot.json
