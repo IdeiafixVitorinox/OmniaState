@@ -550,7 +550,7 @@
         cursor: pointer;
     }
 
-    /* 📱 AJUSTES ESPECÍFICOS PARA ECRÃS DE TELEMÓVEL (MOBILE) */
+    /* 📱 ADAPTAÇÃO PERFEITA PARA TELEMÓVEL NA VERTICAL (SEM CORTES) */
     @@media (max-width: 768px) {
         .welcome-guide-modal {
             padding: 24px 18px;
@@ -569,7 +569,7 @@
         }
 
         .guide-steps-grid {
-            grid-template-columns: 1fr; /* Um cartão por linha no telemóvel */
+            grid-template-columns: 1fr;
             gap: 10px;
             margin-bottom: 18px;
         }
@@ -585,19 +585,70 @@
             width: 100%;
         }
 
+        /* 🎯 BARRA DO TOPO NO TELEMÓVEL */
         .session-hud-top {
             top: 10px;
+            width: 94vw;
+            max-width: 94vw;
         }
 
         .info-bar-horizontal {
-            padding: 4px 12px;
+            width: 100%;
+            justify-content: center;
+            padding: 4px 10px;
             gap: 8px;
+            box-sizing: border-box;
         }
 
         .active-desc {
-            display: none; /* Oculta a descrição longa no telemóvel para poupar espaço */
+            display: none; /* Oculta a descrição longa para poupar espaço */
+        }
+
+        /* 🎯 GRADE 2x2: Elimina definitivamente os cortes laterais */
+        .state-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 botões por linha */
+            gap: 6px;
+            width: 100%;
+            padding: 6px;
+            box-sizing: border-box;
+            border-radius: 16px;
+        }
+
+        .state-block {
+            justify-content: space-between;
+            padding: 3px 6px;
+            border-radius: 12px;
+        }
+
+        .state-btn {
+            min-width: auto;
+            padding: 3px 4px;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .state-btn .symbol {
+            font-size: 0.90rem;
+            margin-bottom: 0;
+        }
+
+        .state-btn .name {
+            font-size: 0.70rem;
+            white-space: nowrap;
+        }
+
+        .state-btn .sub {
+            display: none; /* Oculta o subtítulo pequeno no telemóvel para ficar limpo */
+        }
+
+        .micro-btn {
+            padding: 4px 7px;
+            font-size: 0.65rem;
+            border-radius: 8px;
         }
     }
+
 </style>
 
 @code {
