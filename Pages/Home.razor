@@ -183,6 +183,7 @@
 </div>
 
 <style>
+    /* 1. ESTRUTURA GERAL */
     .omniastate-fullscreen {
         position: relative;
         width: 100vw;
@@ -200,6 +201,7 @@
         z-index: 1;
     }
 
+    /* 2. IMAGEM DE FUNDO EM MARCA DE ÁGUA */
     .watermark-container {
         position: absolute;
         inset: 0;
@@ -222,10 +224,8 @@
         mix-blend-mode: screen;
         border-radius: 50%;
         will-change: transform, opacity;
-        
         -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 70%);
         mask-image: radial-gradient(circle, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 70%);
-
         animation: dissipateSmooth 12s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     }
 
@@ -243,7 +243,7 @@
         100% { opacity: 0.10; transform: scale(1.10); }
     }
 
-    /* 🎯 MODAL DE BOAS-VINDAS (RESPONSIVO PARA COMPUTADOR E TELEMÓVEL) */
+    /* 3. MODAL DE ENTRADA & INSTRUÇÕES (COMPUTADOR) */
     .welcome-guide-modal {
         position: absolute;
         top: 50%;
@@ -259,8 +259,8 @@
         z-index: 20;
         max-width: 820px;
         width: 92vw;
-        max-height: 90dvh; /* Garante que cabe SEMPRE no ecrã do telemóvel */
-        overflow-y: auto;  /* Permite scroll suave caso o ecrã seja muito pequeno */
+        max-height: 90dvh;
+        overflow-y: auto;
         -webkit-overflow-scrolling: touch;
     }
 
@@ -291,7 +291,7 @@
         position: relative;
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 16px 16px;
+        padding: 16px;
         border-radius: 16px;
     }
 
@@ -373,7 +373,7 @@
         box-shadow: 0 0 35px rgba(16, 185, 129, 0.7);
     }
 
-    /* Modais de Conclusão */
+    /* 4. MODAL DE CONCLUSÃO */
     .completion-modal {
         padding: 40px 35px;
     }
@@ -398,40 +398,42 @@
         margin-bottom: 24px;
     }
 
-    /* 🎯 BARRA DE CONTROLO DO TOPO */
+    /* 5. PAINEL DE CONTROLO DO TOPO (COMPUTADOR) */
     .session-hud-top {
         position: absolute;
-        top: 18px;
+        top: 15px;
         left: 50%;
         transform: translateX(-50%);
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
         z-index: 10;
         user-select: none;
-        max-width: 96vw;
+        width: 95vw;
+        max-width: 640px;
     }
 
     .info-bar-horizontal {
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 12px;
-        background: rgba(15, 23, 42, 0.65);
+        background: rgba(15, 23, 42, 0.70);
         padding: 5px 16px;
         border-radius: 9999px;
         border: 1px solid rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(16px);
-        max-width: 95vw;
-        overflow-x: auto;
-        white-space: nowrap;
+        width: auto;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 
     .timer-pill {
         display: flex;
         align-items: center;
-        gap: 6px;
-        font-size: 0.78rem;
+        gap: 5px;
+        font-size: 0.76rem;
         color: #94a3b8;
     }
 
@@ -463,6 +465,7 @@
         font-weight: 600;
         letter-spacing: 0.12em;
         color: #ffffff;
+        white-space: nowrap;
     }
 
     .active-dot {
@@ -473,154 +476,182 @@
     .active-desc {
         font-size: 0.72rem;
         color: #94a3b8;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 280px;
     }
 
-    /* Seletor de Estados com Scroll Touch para Telemóvel */
     .state-selector {
         display: flex;
-        gap: 8px;
-        background: rgba(15, 23, 42, 0.75);
+        gap: 6px;
+        background: rgba(15, 23, 42, 0.80);
         padding: 6px;
         border-radius: 18px;
         border: 1px solid rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(25px);
-        max-width: 95vw;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none; /* Oculta barra de scroll feia */
-    }
-
-    .state-selector::-webkit-scrollbar {
-        display: none;
+        width: 100%;
+        box-sizing: border-box;
+        justify-content: center;
     }
 
     .state-block {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         background: rgba(255, 255, 255, 0.03);
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 14px;
-        padding: 2px 5px 2px 2px;
-        gap: 3px;
-        flex-shrink: 0; /* Impede os botões de serem esmagados no telemóvel */
+        padding: 2px 6px 2px 2px;
+        gap: 4px;
+        transition: all 0.3s ease;
     }
 
     .state-block.selected {
-        background: rgba(255, 255, 255, 0.10);
-        border-color: rgba(255, 255, 255, 0.25);
+        background: rgba(255, 255, 255, 0.12);
+        border-color: rgba(255, 255, 255, 0.30);
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     }
 
     .state-btn {
         display: flex;
         flex-direction: column;
-        align-items: center;
+        align-items: flex-start;
         background: transparent;
         border: none;
-        padding: 6px 10px;
+        padding: 4px 8px;
         border-radius: 10px;
         cursor: pointer;
-        min-width: 95px;
     }
 
     .symbol {
-        font-size: 1.0rem;
-        margin-bottom: 2px;
+        font-size: 0.95rem;
+        margin-bottom: 1px;
     }
 
     .name {
-        font-size: 0.76rem;
+        font-size: 0.74rem;
         font-weight: 600;
         color: #e2e8f0;
+        white-space: nowrap;
     }
 
     .sub {
-        font-size: 0.58rem;
+        font-size: 0.56rem;
         color: #64748b;
+        white-space: nowrap;
     }
 
     .micro-btn {
         background: rgba(255, 255, 255, 0.08);
         border: 1px solid rgba(255, 255, 255, 0.18);
-        padding: 5px 7px;
+        padding: 5px 8px;
         border-radius: 8px;
         font-size: 0.68rem;
         font-weight: 700;
         color: #cbd5e1;
         cursor: pointer;
+        flex-shrink: 0;
     }
 
-    /* 📱 ADAPTAÇÃO FORÇADA PARA TELEMÓVEL (GRADE 2x2) */
+    .micro-btn:hover {
+        background: rgba(245, 158, 11, 0.3);
+        border-color: rgba(245, 158, 11, 0.6);
+        color: #ffffff;
+    }
+
+    /* 🎯 6. ADAPTAÇÃO AUTOMÁTICA PARA TELEMÓVEL (VERTICAL) */
     @@media (max-width: 768px) {
+        /* Entrada perfeita sem zoom */
+        .welcome-guide-modal {
+            padding: 22px 16px;
+            border-radius: 20px;
+            width: 92vw;
+            max-height: 88dvh;
+        }
+
+        .brand-title {
+            font-size: 1.45rem;
+            letter-spacing: 0.25em;
+        }
+
+        .brand-tagline {
+            font-size: 0.72rem;
+            margin-bottom: 14px;
+        }
+
+        .guide-steps-grid {
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .guide-card {
+            padding: 10px 12px;
+        }
+
+        .btn-start {
+            padding: 12px 24px;
+            font-size: 0.78rem;
+            letter-spacing: 0.15em;
+            width: 100%;
+        }
+
+        /* Barra Superior: Grade 2x2 Compacta (SEM CORTES) */
         .session-hud-top {
-            top: 10px !important;
-            width: 95vw !important;
-            max-width: 95vw !important;
+            top: 10px;
+            width: 94vw;
+            max-width: 94vw;
         }
 
         .info-bar-horizontal {
-            width: 100% !important;
-            justify-content: center !important;
-            padding: 4px 10px !important;
-            gap: 6px !important;
-            box-sizing: border-box !important;
+            width: 100%;
+            padding: 4px 8px;
+            gap: 6px;
         }
 
         .active-desc {
-            display: none !important;
+            display: none; /* Oculta descrição longa no telemóvel */
         }
 
-        /* 🎯 GRADE 2x2 FORÇADA: 2 colunas perfeitas sem cortes laterais */
         .state-selector {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr !important; /* Força 2 colunas */
-            gap: 6px !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            padding: 6px !important;
-            box-sizing: border-box !important;
-            border-radius: 16px !important;
-            overflow-x: visible !important;
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 2 botões por linha */
+            gap: 6px;
+            width: 100%;
+            padding: 6px;
+            border-radius: 16px;
         }
 
         .state-block {
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-            padding: 4px 8px !important;
-            border-radius: 12px !important;
-            width: auto !important;
-            flex-shrink: 1 !important;
+            padding: 3px 6px;
+            border-radius: 12px;
+            min-width: 0;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .state-btn {
-            min-width: auto !important;
-            padding: 2px 4px !important;
-            align-items: flex-start !important;
-            text-align: left !important;
+            padding: 2px 4px;
         }
 
         .state-btn .symbol {
-            font-size: 0.95rem !important;
-            margin-bottom: 0 !important;
+            font-size: 0.88rem;
         }
 
         .state-btn .name {
-            font-size: 0.72rem !important;
-            white-space: nowrap !important;
+            font-size: 0.70rem;
         }
 
         .state-btn .sub {
-            display: none !important;
+            display: none; /* Oculta subtítulo no telemóvel para ficar limpo */
         }
 
         .micro-btn {
-            padding: 5px 8px !important;
-            font-size: 0.68rem !important;
-            border-radius: 8px !important;
+            padding: 4px 6px;
+            font-size: 0.65rem;
         }
     }
-
 </style>
 
 @code {
