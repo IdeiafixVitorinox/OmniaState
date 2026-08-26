@@ -1,3 +1,0 @@
-/media/Elements/Projetos/OmniaState/render-build/wwwroot/render-build/sample-data/weather.json
-/media/Elements/Projetos/OmniaState/render-build/wwwroot/render-build/_framework/blazor.boot.json
-/media/Elements/Projetos/OmniaState/render-build/wwwroot/web.config
