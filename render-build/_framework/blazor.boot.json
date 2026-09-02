@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "OmniaState",
   "resources": {
-    "hash": "sha256-MCcvO1I/agGG2iDe6C4WXenecK7QYBeszUeAV44XQoQ=",
+    "hash": "sha256-1N1ED5GoRJV1svoSOwoTSigsufq9JysJOk8IFX7FVdU=",
     "jsModuleNative": {
       "dotnet.native.8.0.30.obzsitvuuz.js": "sha256-dexsp+9ih2C28zVhNnPXUbkz2QCq7lHpkyDcmaLl7NQ="
     },
@@ -31,7 +31,7 @@
       "Microsoft.Extensions.Primitives.wasm": "sha256-6187ynEahDlSLMBvD4vAmiLpZ3clRb5xu6rM7O8AxNo=",
       "Microsoft.JSInterop.wasm": "sha256-m8HSFXr/xs0H0tzrFxpE88TXHxDfR6wN+Rp6z3npXHw=",
       "Microsoft.JSInterop.WebAssembly.wasm": "sha256-haO0j1Scd25k71V3+oHgCTwEx2GPGs39yGGx0nmSxIQ=",
-      "OmniaState.wasm": "sha256-ebW/yDFfVAvZ1e0dmxOUtuWLVt3xeVRf5wLvUrrcDLw=",
+      "OmniaState.wasm": "sha256-969KkEzveOwhiPFsoVLYGLQP4XIhhTo3f61O9mUS0FA=",
       "System.Collections.Concurrent.wasm": "sha256-T37zsqb3qmHd6V+gvzrWO4KKFSluRCgqdaB3fu3cngc=",
       "System.Collections.wasm": "sha256-gkEzQSj9JndIFA270ufVnY3AO4SUzsfeQpDyeRzZ/tk=",
       "System.ComponentModel.wasm": "sha256-gr1bMtvsV0b8hWhKYos+74JLu9O6zG/7taOD78q4uys=",
