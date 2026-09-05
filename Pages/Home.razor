@@ -86,12 +86,16 @@
             </div>
         </div>
     }
-    else if (isSessionCompleted && sessionMode == "long")
+    else if (isSessionCompleted && (sessionMode == "long" || sessionMode == "journey-completed"))
     {
         <div class="welcome-guide-modal completion-modal">
             <div class="completion-icon">✨</div>
-            <h2 class="completion-title">INTEGRAÇÃO CONCLUÍDA</h2>
-            <p class="completion-desc">O ciclo de 70 segundos foi completado. Permanece no estado de presença e quietude.</p>
+            <h2 class="completion-title">@(sessionMode == "journey-completed" ? "JORNADA CONCLUÍDA" : "INTEGRAÇÃO CONCLUÍDA")</h2>
+            <p class="completion-desc">
+                @(sessionMode == "journey-completed" 
+                    ? "A sequência dos 4 estados foi completada. Permanece no estado de presença e quietude." 
+                    : "O ciclo de 70 segundos foi completado. Permanece no estado de presença e quietude.")
+            </p>
             
             <button class="btn-start btn-restart" @onclick="RestartNewSession">
                 NOVA SESSÃO
@@ -115,10 +119,10 @@
         <!-- 4. Interface da Sessão Ativa no Topo -->
         <div class="session-hud-top @(isHudVisible ? "hud-visible" : "hud-hidden")">
             <div class="info-bar-horizontal">
-                @if (sessionMode == "long")
+                @if (sessionMode == "long" || sessionMode == "journey")
                 {
                     <div class="timer-pill">
-                        <span class="timer-label">Integração:</span>
+                        <span class="timer-label">@(sessionMode == "journey" ? "Jornada:" : "Integração:")</span>
                         <span class="timer-digits">@FormatTime(elapsedSeconds) / @(sessionMode == "journey" ? "04:40" : "01:10")</span>
                     </div>
                 }
