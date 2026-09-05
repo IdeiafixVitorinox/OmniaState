@@ -241,6 +241,7 @@ export function activateMicroSession(stateKey) {
 }
 
 export function stopSessionAudio() {
-    stopOrganicAudio();    // 🎯 Para o som
+    clearAllTimeouts();    // 🎯 Cancela qualquer temporizador em memória
+    stopOrganicAudio();    // Para o som
     targetSpeed = 0.0008;  // Desacelera o toroide para repouso
 }

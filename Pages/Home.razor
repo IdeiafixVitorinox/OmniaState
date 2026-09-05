@@ -730,12 +730,14 @@
             }
             else if (sessionMode == "long" && elapsedSeconds >= TargetSeconds)
             {
+                sessionMode = "long-completed"; // 🎯 1. Fecha o modo "long"
+                sessionStarted = false;         // 🎯 2. Desliga o estado ativo da sessão
                 isSessionCompleted = true;
                 _sessionTimer?.Dispose();
+                _sessionTimer = null;
 
                 await InvokeAsync(async () =>
                 {
-                    // ✅ AGORA (para o som e entra em repouso):
                     if (_jsModule != null)
                     {
                         await _jsModule.InvokeVoidAsync("stopSessionAudio");
