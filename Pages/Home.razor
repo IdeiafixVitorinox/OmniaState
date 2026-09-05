@@ -846,19 +846,24 @@
             }
             else if (sessionMode == "long" && elapsedSeconds >= TargetSeconds)
             {
-                sessionMode = "long-completed"; // 🎯 1. Fecha o modo "long"
-                sessionStarted = false;         // 🎯 2. Desliga o estado ativo da sessão
-                isSessionCompleted = true;
+                sessionMode = "long-completed"; // 1. Marca o modo como terminado
+                sessionStarted = false;         // 2. Desliga a sessão ativa
+                isSessionCompleted = true;       // 3. Ativa o ecrã de conclusão
                 _sessionTimer?.Dispose();
                 _sessionTimer = null;
 
                 await InvokeAsync(async () =>
                 {
-                    if (_jsModule != null)
+                    StateHasChanged(); // 🎯 4. Desenha logo o modal no ecrã de imediato
+
+                    try
                     {
-                        await _jsModule.InvokeVoidAsync("stopSessionAudio");
+                        if (_jsModule != null)
+                        {
+                            await _jsModule.InvokeVoidAsync("stopSessionAudio"); // 🎯 5. Desliga o som em segundo plano
+                        }
                     }
-                    StateHasChanged();
+                    catch { }
                 });
             }
         }, null, 1000, 1000);
