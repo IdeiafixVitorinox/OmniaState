@@ -15,7 +15,8 @@
     @if (sessionStarted && !isSessionCompleted)
     {
         <div class="watermark-container">
-            <img class="watermark-img @currentCssClass" src="@currentImageSrc" alt="BioGeometria" />
+            <!-- ✅ AGORA (reinicia o fade e a expansão de luz em cada estado): -->
+            <img @key="currentStateKey" class="watermark-img @currentCssClass" src="@currentImageSrc" alt="BioGeometria" />
         </div>
     }
 
