@@ -4,7 +4,10 @@
 
 <PageTitle>OmniaState – Regulação Sensorial</PageTitle>
 
-<div class="omniastate-fullscreen">
+<div class="omniastate-fullscreen" 
+     @onmousemove="OnUserActivity" 
+     @ontouchstart="OnUserActivity" 
+     @onclick="OnUserActivity">
     <!-- 1. Motor Gráfico Toroidal (60 FPS) -->
     <canvas id="toroidCanvas"></canvas>
 
@@ -104,7 +107,7 @@
     else
     {
         <!-- 4. Interface da Sessão Ativa no Topo -->
-        <div class="session-hud-top">
+        <div class="session-hud-top @(isHudVisible ? "hud-visible" : "hud-hidden")">
             <div class="info-bar-horizontal">
                 @if (sessionMode == "long")
                 {
@@ -419,7 +422,6 @@
         position: absolute;
         top: 8px;
         left: 50%;
-        transform: translateX(-50%);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -429,6 +431,21 @@
         width: 92vw;
         max-width: 480px;
         box-sizing: border-box;
+        transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s ease;
+    }
+
+    /* Esconde a barra quando em repouso */
+    .session-hud-top.hud-hidden {
+        opacity: 0;
+        pointer-events: none;
+        transform: translate(-50%, -15px);
+    }
+
+    /* Mostra a barra quando há toque ou movimento */
+    .session-hud-top.hud-visible {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translate(-50%, 0);
     }
 
     /* Caixa de Nota de Engenharia / Livro */
@@ -623,6 +640,8 @@
     private static Home? _instance;
 
     private bool sessionStarted = false;
+    private bool isHudVisible = false;
+    private System.Threading.Timer? _idleTimer;
     private bool isSessionCompleted = false;
     private int elapsedSeconds = 0;
     private const int TargetSeconds = 7 * 60; // 7 Minutos
@@ -646,6 +665,21 @@
             );
             await _jsModule.InvokeVoidAsync("initToroid", "toroidCanvas");
         }
+    }
+
+    private void OnUserActivity()
+    {
+        if (!sessionStarted || isSessionCompleted) return;
+
+        isHudVisible = true;
+        StateHasChanged();
+
+        _idleTimer?.Dispose();
+        _idleTimer = new System.Threading.Timer(_ =>
+        {
+            isHudVisible = false;
+            InvokeAsync(StateHasChanged);
+        }, null, 3500, Timeout.Infinite); // Desvanece após 3.5 segundos sem tocar
     }
 
     private async Task StartExperience()
@@ -812,6 +846,7 @@
     public async ValueTask DisposeAsync()
     {
         _sessionTimer?.Dispose();
+        _idleTimer?.Dispose(); // <- Adicionar esta linha
         if (_jsModule != null)
         {
             await _jsModule.DisposeAsync();
