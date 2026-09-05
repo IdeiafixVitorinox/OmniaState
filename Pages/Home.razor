@@ -75,9 +75,15 @@
                 </div>
             </div>
 
-            <button class="btn-start" @onclick="StartExperience">
-                ENTRAR NO CAMPO SENSORIAL
-            </button>
+            <!-- 🎯 BOTÕES DE ENTRADA: Escolha Livre ou Experiência Completa -->
+            <div class="welcome-actions">
+                <button class="btn-start btn-secondary-action" @onclick="StartExperience">
+                    ESCOLHER ESTADO
+                </button>
+                <button class="btn-start btn-primary-action" @onclick="StartFullJourney">
+                    EXPERIÊNCIA COMPLETA (4m 40s)
+                </button>
+            </div>
         </div>
     }
     else if (isSessionCompleted && sessionMode == "long")
@@ -113,7 +119,7 @@
                 {
                     <div class="timer-pill">
                         <span class="timer-label">Integração:</span>
-                        <span class="timer-digits">@FormatTime(elapsedSeconds) / 01:10</span>
+                        <span class="timer-digits">@FormatTime(elapsedSeconds) / @(sessionMode == "journey" ? "04:40" : "01:10")</span>
                     </div>
                 }
                 @if (sessionMode == "short")
@@ -390,6 +396,29 @@
     .btn-start:hover {
         background: rgba(16, 185, 129, 0.55);
         box-shadow: 0 0 35px rgba(16, 185, 129, 0.7);
+    }
+
+    .welcome-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+    .btn-secondary-action {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: #e2e8f0;
+        max-width: 220px;
+    }
+
+    .btn-secondary-action:hover {
+        background: rgba(255, 255, 255, 0.18);
+    }
+
+    .btn-primary-action {
+        max-width: 280px;
     }
 
     /* 4. MODAIS DE CONCLUSÃO */
@@ -688,6 +717,89 @@
         sessionStarted = true;
         isSessionCompleted = false;
         await SetState("ponto-zero");
+    }
+
+    // 🎯 ARRANQUE DA EXPERIÊNCIA COMPLETA (Passa automaticamente pelos 4 estados a cada 70s)
+    private async Task StartFullJourney()
+    {
+        sessionMode = "journey";
+        sessionStarted = true;
+        isSessionCompleted = false;
+        elapsedSeconds = 0;
+        isHudVisible = false; // Modo imersivo imediato
+
+        _sessionTimer?.Dispose();
+        await SetStateInternal("ponto-zero");
+
+        _sessionTimer = new System.Threading.Timer(async _ =>
+        {
+            if (sessionMode == "journey" && elapsedSeconds < 280) // 4x 70s = 280s (04:40)
+            {
+                elapsedSeconds++;
+
+                // Transições automáticas a cada 70 segundos
+                if (elapsedSeconds == 70) await InvokeAsync(() => SetStateInternal("cura"));
+                else if (elapsedSeconds == 140) await InvokeAsync(() => SetStateInternal("clareza"));
+                else if (elapsedSeconds == 210) await InvokeAsync(() => SetStateInternal("paz"));
+
+                await InvokeAsync(StateHasChanged);
+            }
+            else if (sessionMode == "journey" && elapsedSeconds >= 280)
+            {
+                sessionMode = "journey-completed";
+                sessionStarted = false;
+                isSessionCompleted = true;
+                _sessionTimer?.Dispose();
+                _sessionTimer = null;
+
+                await InvokeAsync(async () =>
+                {
+                    if (_jsModule != null)
+                    {
+                        await _jsModule.InvokeVoidAsync("stopSessionAudio");
+                    }
+                    StateHasChanged();
+                });
+            }
+        }, null, 1000, 1000);
+    }
+
+    // Método auxiliar para mudar estado sem reiniciar o temporizador geral da jornada
+    private async Task SetStateInternal(string key)
+    {
+        currentStateKey = key;
+        currentCssClass = key;
+
+        switch (key)
+        {
+            case "cura":
+                currentImageSrc = "images/cura.png";
+                stateTitle = "CURA & VITALIDADE";
+                stateDescription = "Harmonizador L-66 • Higher Harmonic of Gold";
+                await SendToJS("cura", 0.004, 245, 158, 11);
+                break;
+            case "clareza":
+                currentImageSrc = "images/clareza.webp";
+                stateTitle = "CLAREZA & FOCO";
+                stateDescription = "Emissor Polar de 16 Raios • Visão Sem Ilusão";
+                await SendToJS("clareza", 0.006, 56, 189, 248);
+                break;
+            case "paz":
+                currentImageSrc = "images/paz.jpg";
+                stateTitle = "PAZ & RENDIÇÃO";
+                stateDescription = "Flor da Coerência • Entrega à Graça";
+                await SendToJS("paz", 0.003, 168, 85, 247);
+                break;
+            case "ponto-zero":
+            default:
+                currentImageSrc = "images/ponto-zero.jpg";
+                stateTitle = "PONTO ZERO";
+                stateDescription = "Eixo Vertical Cósmico • Presença do Eu Sou";
+                await SendToJS("ponto-zero", 0.0025, 16, 185, 129);
+                break;
+        }
+
+        StateHasChanged();
     }
 
     private async Task StartLongSession(string key)
