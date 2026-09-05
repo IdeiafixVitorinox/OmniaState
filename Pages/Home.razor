@@ -735,9 +735,10 @@
 
                 await InvokeAsync(async () =>
                 {
+                    // ✅ AGORA (para o som e entra em repouso):
                     if (_jsModule != null)
                     {
-                        await _jsModule.InvokeVoidAsync("activateState", currentStateKey, 0.0008, new { r = 16, g = 185, b = 129 });
+                        await _jsModule.InvokeVoidAsync("stopSessionAudio");
                     }
                     StateHasChanged();
                 });

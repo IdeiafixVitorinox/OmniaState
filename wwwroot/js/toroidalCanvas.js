@@ -239,3 +239,8 @@ export function activateMicroSession(stateKey) {
     }, 7000);
     activeTimeouts.push(t2);
 }
+
+export function stopSessionAudio() {
+    stopOrganicAudio();    // 🎯 Para o som
+    targetSpeed = 0.0008;  // Desacelera o toroide para repouso
+}
